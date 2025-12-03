@@ -1,5 +1,6 @@
 package view;
 
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ public class LoginView {
     private Label messageLabel;
     private Button loginButton;
     private Button registerButton;
+
     
     public LoginView(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -104,6 +106,8 @@ public class LoginView {
         passwordField.clear();
         messageLabel.setText("");
     }
+    
+    
     
     // Event handler setters
     public void setLoginButtonAction(Runnable action) {

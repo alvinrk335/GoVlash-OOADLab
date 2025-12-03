@@ -16,7 +16,7 @@ public class ManageServiceView {
 	private Button btnAdd, btnUpdate, btnDelete, btnClear, btnBack;
 	private ServiceController controller = new ServiceController();
 
-	private Runnable backAction; // <- BACK CALLBACK
+	private Runnable backAction;
 
 	public void setBackButtonAction(Runnable backAction) {
 		this.backAction = backAction;
@@ -50,7 +50,7 @@ public class ManageServiceView {
 		btnUpdate = new Button("Update");
 		btnDelete = new Button("Delete");
 		btnClear = new Button("Clear");
-		btnBack = new Button("Back"); // <- BUTTON BACK
+		btnBack = new Button("Back");
 
 		btnAdd.setPrefWidth(120);
 		btnUpdate.setPrefWidth(120);
@@ -59,7 +59,7 @@ public class ManageServiceView {
 		btnBack.setPrefWidth(120);
 
 		VBox formBox = new VBox(10, lblTitle, tfName, tfDescription, tfPrice, tfDuration,
-				btnAdd, btnUpdate, btnDelete, btnClear, btnBack // <- ADD BACK BUTTON
+				btnAdd, btnUpdate, btnDelete, btnClear, btnBack 
 		);
 
 		formBox.setPadding(new Insets(20));
@@ -91,18 +91,18 @@ public class ManageServiceView {
 
 		table.setOnMouseClicked(e -> fillFormFromTable());
 
-		// BUTTON EVENTS
+
 		btnAdd.setOnAction(e -> addService());
 		btnUpdate.setOnAction(e -> updateService());
 		btnDelete.setOnAction(e -> deleteService());
 		btnClear.setOnAction(e -> clearForm());
 
-		// ---- BACK BUTTON ACTION ----
+
 		btnBack.setOnAction(e -> {
 			if (backAction != null) {
 				Stage stg = (Stage) btnBack.getScene().getWindow();
-				stg.close();     // tutup window sekarang
-				backAction.run(); // kembali ke dashboard admin
+				stg.close();     
+				backAction.run(); 
 			}
 		});
 
@@ -114,7 +114,7 @@ public class ManageServiceView {
 		stage.show();
 	}
 
-	// ------------- LOGIC AREA -----------------
+
 
 	private void fillFormFromTable() {
 		Service s = table.getSelectionModel().getSelectedItem();
@@ -194,7 +194,7 @@ public class ManageServiceView {
 			return;
 		}
 
-		s.deleteService();
+		controller.deleteService(s.getServiceID());
 		alert("Service deleted!");
 		refresh();
 		clearForm();

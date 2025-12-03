@@ -1,25 +1,30 @@
 package controller;
 
 
+import dao.ServiceDAO;
 import javafx.collections.ObservableList;
 import model.Service;
 
 public class ServiceController {
+	private ServiceDAO dao = new ServiceDAO();
+	
+	
 	public void addService(String name, String description, double price, int duration) {
-		Service service = new Service(0, name, description, price, duration);
-		service.addService();
-		
+		dao.addService(name, description, price, duration);		
 	}
 	
 	public void editService(int serviceId, String name, String description, double price, int duration) {
 		Service service = new Service(serviceId, name, description, price, duration);
-		service.updateService();
+		dao.updateService(service);
 	}
 	
 	public ObservableList<Service> getAllServices(){
-		ObservableList<Service> services = Service.getAllServices();
-		
+		ObservableList<Service> services = dao.getAllServices();
 		return services;
+	}
+	
+	public void deleteService(Integer serviceID) {
+		dao.deleteService(serviceID);
 	}
 	
 	public String validateAddService(String name, String description, double price, int duration) {
@@ -53,12 +58,17 @@ public class ServiceController {
 	}
 	
 	public String validateEditService(Integer serviceId, String name, String description, double price, int duration) {
-
+		boolean found = dao.searchService(serviceId);
+		
+		if(!found) {
+			return "service not found";
+		}
+		
 		return validateAddService(name, description, price, duration);
 	}
 	
 	public Service getServiceById(Integer id) {
-		return Service.getServiceById(id);
+		return dao.getServiceById(id);
 	}
 }
 

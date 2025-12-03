@@ -13,8 +13,7 @@ import javafx.stage.Stage;
 import model.User;
 import model.Customer;
 import util.Connect;
-import controller.AuthController;
-import controller.RegisterController;
+import controller.UserController;
 import controller.ServiceController;
 import controller.TransactionController;
 import model.Service;
@@ -23,6 +22,7 @@ import view.LoginView;
 import view.RegisterView;
 import view.ManageServiceView;
 import view.ServiceCatalogView;
+import view.AdminDashboardView;
 import view.CreateTransactionView;
 
 import java.sql.ResultSet;
@@ -33,10 +33,10 @@ public class Main extends Application {
 
 	private Stage primaryStage;
 	private Connect connect = Connect.getInstance();
-	private AuthController authController = new AuthController();
-	private RegisterController registerController = new RegisterController();
+	private UserController userController = new UserController();
 	private ServiceController serviceController = new ServiceController();
 	private TransactionController transactionController = new TransactionController();
+	private static User currentUser;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -50,33 +50,34 @@ public class Main extends Application {
 	
 	private void showLoginView() {
 		LoginView loginView = new LoginView(primaryStage);
-		
 		loginView.setLoginButtonAction(() -> {
-			String username = loginView.getUsername();
-			String password = loginView.getPassword();
-			
-			if (username.isEmpty() || password.isEmpty()) {
+	    	String userName = loginView.getUsername();
+	    	String password = loginView.getPassword();
+	    	
+	    	
+	    	User currentUser = userController.login(userName, password);
+	    	setCurrentUser(currentUser);
+	    	
+	    	if (userName.isEmpty() || password.isEmpty()) {
 				loginView.setMessage("Please fill in all fields!", true);
 				return;
 			}
 			
-			User user = authController.authenticate(username, password);
-			if (user != null) {
+			if (currentUser != null) {
 				loginView.setMessage("Login successful!", false);
-				
-				// Navigate based on role
-				switch (user.getUserRole()) {
-					case "Admin":
-						showAdminDashboard(user);
+			
+				switch (currentUser.getUserRole().toLowerCase()) {
+					case "admin":
+						showAdminDashboard(currentUser);
 						break;
-					case "Receptionist":
-						showReceptionistDashboard(user);
+					case "receptionist":
+						showReceptionistDashboard(currentUser);
 						break;
-					case "Laundry Staff":
-						showLaundryStaffDashboard(user);
+					case "laundry staff":
+						showLaundryStaffDashboard(currentUser);
 						break;
-					case "Customer":
-						showCustomerDashboard(user);
+					case "customer":
+						showCustomerDashboard(currentUser);
 						break;
 					default:
 						loginView.setMessage("Invalid user role!", true);
@@ -87,86 +88,24 @@ public class Main extends Application {
 		});
 		
 		loginView.setRegisterButtonAction(() -> showRegisterView());
+		
 		loginView.show();
 	}
 	
 	private void showRegisterView() {
 		RegisterView registerView = new RegisterView(primaryStage);
-		
-		registerView.setRegisterButtonAction(() -> {
-			String uname = registerView.getUsername();
-			String email = registerView.getEmail();
-			String pwd = registerView.getPassword();
-			String confirm = registerView.getConfirmPassword();
-			String gender = registerView.getGender();
-			java.time.LocalDate dob = registerView.getDateOfBirth();
-
-			if (uname.isEmpty() || email.isEmpty() || pwd.isEmpty() || confirm.isEmpty() || gender == null || dob == null) {
-				registerView.setMessage("Please fill in all fields.", true);
-				return;
-			}
-
-			if (!pwd.equals(confirm)) {
-				registerView.setMessage("Passwords do not match.", true);
-				return;
-			}
-
-			Customer c = new Customer();
-			c.setUserName(uname);
-			c.setUserEmail(email);
-			c.setUserPassword(pwd);
-			c.setUserGender(gender);
-			c.setUserDOB(dob);
-
-			if (!c.isValidUser()) {
-				registerView.setMessage("Validation failed: check input requirements.", true);
-				return;
-			}
-
-			boolean ok = registerController.registerCustomer(c);
-			if (ok) {
-				registerView.setMessage("Registration successful. You may login now.", false);
-			} else {
-				registerView.setMessage("Registration failed: username/email may exist.", true);
-			}
-		});
-		
 		registerView.setBackButtonAction(() -> showLoginView());
 		registerView.show();
 	}
 	
 	private void showAdminDashboard(User user) {
-		primaryStage.setTitle("GoVlash Laundry - Admin Dashboard");
+		AdminDashboardView dashboard = new AdminDashboardView(primaryStage, user);
+		dashboard.setOnManageEmployees(() -> showManageEmployeeView());
+		dashboard.setOnManageServices(() -> showManageServiceView());
+		dashboard.setOnViewTransactions(() -> showAllTransactionsView());
+		dashboard.setOnLogout(() -> showLoginView());
 		
-		VBox root = new VBox(10);
-		root.setPadding(new Insets(20));
-		root.setAlignment(Pos.CENTER);
-		
-		Label welcomeLabel = new Label("Welcome, Admin " + user.getUserName() + "!");
-		welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-		
-		Button manageEmployeeButton = new Button("Manage Employees");
-		Button manageServiceButton = new Button("Manage Services");
-		Button viewTransactionButton = new Button("View All Transactions");
-		Button logoutButton = new Button("Logout");
-		
-		// Button styling
-		manageEmployeeButton.setPrefWidth(200);
-		manageServiceButton.setPrefWidth(200);
-		viewTransactionButton.setPrefWidth(200);
-		logoutButton.setPrefWidth(200);
-		
-		// Event handlers
-		manageEmployeeButton.setOnAction(e -> showManageEmployeeView());
-		manageServiceButton.setOnAction(e -> showManageServiceView());
-		viewTransactionButton.setOnAction(e -> showAllTransactionsView());
-		logoutButton.setOnAction(e -> showLoginView());
-		
-		root.getChildren().addAll(welcomeLabel, manageEmployeeButton, manageServiceButton, 
-								 viewTransactionButton, logoutButton);
-		
-		Scene scene = new Scene(root, 400, 300);
-		primaryStage.setScene(scene);
+		dashboard.show();
 	}
 	
 	private void showManageEmployeeView() {
@@ -462,5 +401,9 @@ public class Main extends Application {
 		admin.setUserName("Admin");
 		admin.setUserRole("Admin");
 		return admin;
+	}
+	
+	public static void setCurrentUser(User user) {
+		currentUser = user;
 	}
 }

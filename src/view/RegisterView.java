@@ -8,7 +8,10 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import model.Customer;
+
 import java.time.LocalDate;
+import controller.UserController;
 
 public class RegisterView {
     
@@ -22,10 +25,12 @@ public class RegisterView {
     private Label messageLabel;
     private Button registerButton;
     private Button backButton;
+    private UserController controller = new UserController();
     
     public RegisterView(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initializeComponents();
+        setRegisterButtonAction();
     }
     
     private void initializeComponents() {
@@ -144,9 +149,31 @@ public class RegisterView {
         messageLabel.setText("");
     }
     
+    public void handleRegister() {
+    	
+    	
+		String uname = getUsername();
+		String email = getEmail();
+		String pwd = getPassword();
+		String confirm = getConfirmPassword();
+		String gender = getGender();
+		java.time.LocalDate dob = getDateOfBirth();
+
+
+		String registMsg = controller.validateAddCustomer(uname, email, pwd, confirm, gender, dob);
+		setMessage(registMsg, !registMsg.equals("customer registered, go back to login to continue"));
+		System.out.println(registMsg);
+
+		
+		if(registMsg.equals("customer registered, go back to login to continue")) {
+			controller.addCustomer(uname, email, pwd, gender, dob);
+		}
+		
+    }
+    
     // Event handler setters
-    public void setRegisterButtonAction(Runnable action) {
-        registerButton.setOnAction(e -> action.run());
+    public void setRegisterButtonAction() {
+    	registerButton.setOnAction(e -> handleRegister());
     }
     
     public void setBackButtonAction(Runnable action) {
