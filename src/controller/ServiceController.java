@@ -1,6 +1,8 @@
 package controller;
 
 
+import java.util.List;
+
 import dao.ServiceDAO;
 import javafx.collections.ObservableList;
 import model.Service;
@@ -18,8 +20,8 @@ public class ServiceController {
 		dao.updateService(service);
 	}
 	
-	public ObservableList<Service> getAllServices(){
-		ObservableList<Service> services = dao.getAllServices();
+	public List<Service> getAllServices(){
+		List<Service> services = dao.getAllServices();
 		return services;
 	}
 	

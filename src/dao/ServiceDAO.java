@@ -69,7 +69,8 @@ public class ServiceDAO {
 		ObservableList<Service> list = FXCollections.observableArrayList();
 		String query = "SELECT * FROM " + table_name + " ORDER BY serviceID ASC";
 
-		try (ResultSet rs = db.execQuery(query)) {
+		try {
+			ResultSet rs = db.execQuery(query);
 			while (rs.next()) {
 				list.add(new Service(rs.getInt("serviceID"), rs.getString("serviceName"),
 						rs.getString("serviceDescription"), (double) rs.getInt("servicePrice"),

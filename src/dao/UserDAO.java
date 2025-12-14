@@ -96,9 +96,10 @@ public class UserDAO {
     public User getUserByUsername(String username) {
         String query = "SELECT * FROM " + table_name + " WHERE userName = ?";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
+        try {
+        	Connection conn = db.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
 
@@ -246,5 +247,19 @@ public class UserDAO {
             dob,
             rs.getString("userRole")
         );
+    }
+    
+    public boolean isUsernameOrEmailTaken(String username, String email) {
+        try {
+            String query = "SELECT COUNT(*) AS cnt FROM MsUser WHERE userName = '" + username + 
+                          "' OR userEmail = '" + email + "'";
+            ResultSet rs = db.execQuery(query);
+            if (rs.next()) {
+                return rs.getInt("cnt") > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;  
     }
 }

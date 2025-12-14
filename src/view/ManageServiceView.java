@@ -1,6 +1,7 @@
 package view;
 
 import controller.ServiceController;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -69,7 +70,7 @@ public class ManageServiceView {
 
 		// right side
 		table = new TableView<>();
-		table.setItems(controller.getAllServices());
+		table.setItems((ObservableList<Service>) controller.getAllServices());
 
 		TableColumn<Service, Integer> colID = new TableColumn<>("ID");
 		colID.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getServiceID()).asObject());
@@ -201,7 +202,7 @@ public class ManageServiceView {
 	}
 
 	private void refresh() {
-		table.setItems(controller.getAllServices());
+		table.setItems((ObservableList<Service>) controller.getAllServices());
 	}
 
 	private void clearForm() {

@@ -157,7 +157,7 @@ public class RegisterView {
 		String pwd = getPassword();
 		String confirm = getConfirmPassword();
 		String gender = getGender();
-		java.time.LocalDate dob = getDateOfBirth();
+		LocalDate dob = getDateOfBirth();
 
 
 		String registMsg = controller.validateAddCustomer(uname, email, pwd, confirm, gender, dob);

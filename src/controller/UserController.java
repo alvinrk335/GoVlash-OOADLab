@@ -1,14 +1,7 @@
 package controller;
 
-import model.Customer;
 import model.Employee;
 import model.User;
-import util.Connect;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -17,7 +10,6 @@ import javafx.collections.ObservableList;
 
 public class UserController {
 
-    private Connect connect = Connect.getInstance();
     private UserDAO dao = new UserDAO();
 
     public void addCustomer(String name, String email, String password,String gender, LocalDate dob) {
@@ -81,7 +73,7 @@ public class UserController {
     		return "role Must be either “Admin”, “Laundry Staff”, or “Receptionist”";
     	}
     	
-    	return "employee registered, go back to login to continue";
+    	return "employee registered";
     }
     
     public String validateAddCustomer(String name, String email, String password, String confirmPassword, String gender, LocalDate dob) {
@@ -139,17 +131,7 @@ public class UserController {
     }
     
     private boolean isUsernameOrEmailTaken(String username, String email) {
-        try {
-            String query = "SELECT COUNT(*) AS cnt FROM MsUser WHERE userName = '" + username + 
-                          "' OR userEmail = '" + email + "'";
-            ResultSet rs = connect.execQuery(query);
-            if (rs.next()) {
-                return rs.getInt("cnt") > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return true;  
+        return dao.isUsernameOrEmailTaken(username, email);
     }
     
     private boolean isEmailUnique(String email) {

@@ -42,11 +42,9 @@ public class CreateTransactionView {
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
         
-        // Title
         Label titleLabel = new Label("Create New Laundry Order");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         
-        // Service information
         VBox serviceInfoBox = new VBox(5);
         serviceInfoBox.setAlignment(Pos.CENTER);
         serviceInfoBox.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10; -fx-background-radius: 5;");
@@ -61,26 +59,25 @@ public class CreateTransactionView {
         
         serviceInfoBox.getChildren().addAll(serviceLabel, serviceInfoLabel);
         
-        // Form
+
         GridPane form = new GridPane();
         form.setHgap(15);
         form.setVgap(15);
         form.setAlignment(Pos.CENTER);
         form.setPrefWidth(400);
         
-        // Weight input
+
         form.add(new Label("Weight (kg):"), 0, 0);
         weightField = new TextField();
         weightField.setPromptText("Enter weight (2-50 kg)");
         weightField.textProperty().addListener((obs, oldText, newText) -> updateTotalPrice());
         form.add(weightField, 1, 0);
         
-        // Weight validation label
+
         Label weightHint = new Label("Minimum: 2 kg, Maximum: 50 kg");
         weightHint.setStyle("-fx-text-fill: gray; -fx-font-size: 10px;");
         form.add(weightHint, 1, 1);
         
-        // Notes input
         form.add(new Label("Notes (Optional):"), 0, 2);
         notesArea = new TextArea();
         notesArea.setPromptText("Special instructions or notes...");
@@ -88,12 +85,12 @@ public class CreateTransactionView {
         notesArea.setPrefWidth(200);
         form.add(notesArea, 1, 2);
         
-        // Total price display
+
         totalPriceLabel = new Label("Total: Rp 0");
         totalPriceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         totalPriceLabel.setStyle("-fx-text-fill: #2e7d32;");
         
-        // Buttons
+
         HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);
         
@@ -106,7 +103,7 @@ public class CreateTransactionView {
         
         buttonBox.getChildren().addAll(createButton, backButton);
         
-        // Message label
+
         messageLabel = new Label();
         
         root.getChildren().addAll(
@@ -174,12 +171,11 @@ public class CreateTransactionView {
                 showMessage("Order created successfully! Your laundry will be ready in " + 
                           selectedService.getServiceDuration() + " days.", false);
                 
-                // Clear form
+
                 weightField.clear();
                 notesArea.clear();
                 totalPriceLabel.setText("Total: Rp 0");
                 
-                // Show success dialog
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Order Created");
                 successAlert.setHeaderText("Your laundry order has been placed!");
