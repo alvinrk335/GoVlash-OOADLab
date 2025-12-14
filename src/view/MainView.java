@@ -90,8 +90,7 @@ public class MainView extends Application {
 	}
 	
 	private void showManageEmployeeView() {
-		ObservableList<Employee> employeeList = userController.getAllEmployees();
-		ManageEmployeeView view = new ManageEmployeeView(primaryStage);
+		ManageEmployeeView view = new ManageEmployeeView(primaryStage, currentUser);
 
 
 	    view.setBackAction(() -> {

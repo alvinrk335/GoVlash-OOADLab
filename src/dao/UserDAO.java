@@ -199,7 +199,7 @@ public class UserDAO {
     //search by role
     public ObservableList<User> getUsersByRole(String role){
     	ObservableList<User> e = FXCollections.observableArrayList();
-    	String query = "SELECT * FROM " + table_name + " WHERE userRole ==" + '\'' + role + '\'';
+    	String query = "SELECT * FROM " + table_name + " WHERE userRole = '" + role + "'";
     	
     	try {
 			ResultSet rs = db.execQuery(query);

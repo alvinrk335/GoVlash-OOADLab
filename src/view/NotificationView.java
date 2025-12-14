@@ -57,7 +57,7 @@ public class NotificationView {
             btnDelete.setPrefWidth(200);
             btnRefresh.setPrefWidth(200);
 
-            actionBox.getChildren().addAll(btnViewDetail, btnDelete, btnRefresh);
+            actionBox.getChildren().addAll(btnDelete, btnRefresh);
 
             // BUTTON ACTIONS
 

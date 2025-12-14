@@ -14,67 +14,71 @@ import model.User;
 public class AdminDashboardView {
     private Stage primaryStage;
     private User currentUser;
+
     private Runnable onManageEmployees;
     private Runnable onManageServices;
     private Runnable onViewTransactions;
     private Runnable onSendNotifications;
     private Runnable onLogout;
-    
+
     public AdminDashboardView(Stage stage, User currentUser) {
         this.primaryStage = stage;
         this.currentUser = currentUser;
         initialize();
     }
-    
-    public void initialize() {
-        primaryStage.setTitle("GoVlash Laundry - Admin Dashboard");
-        
+
+    private void initialize() {
+        primaryStage.setTitle("GoVlash Laundry - Dashboard");
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        
-        Label welcomeLabel = new Label("Welcome, Admin " + currentUser.getUserName() + "!");
-        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        
-        Button manageEmployeeButton = new Button("Manage Employees");
-        Button manageServiceButton = new Button("Manage Services");
-        Button viewTransactionButton = new Button("View All Transactions");
-        Button sendNotificationsButton = new Button("Send Notifications");
-        Button logoutButton = new Button("Logout");
-        
-        // Set button widths
-        manageEmployeeButton.setPrefWidth(200);
-        manageServiceButton.setPrefWidth(200);
-        viewTransactionButton.setPrefWidth(200);
-        sendNotificationsButton.setPrefWidth(200); 
-        logoutButton.setPrefWidth(200);
 
-        // Button actions
-        manageEmployeeButton.setOnAction(e -> onManageEmployees.run());
-        manageServiceButton.setOnAction(e -> onManageServices.run());
-        viewTransactionButton.setOnAction(e -> onViewTransactions.run());
-        sendNotificationsButton.setOnAction(e -> {
-            if (onSendNotifications != null) onSendNotifications.run();
-        }); // new
-        logoutButton.setOnAction(e -> onLogout.run());
-        
-        root.getChildren().addAll(
-            welcomeLabel, 
-            manageEmployeeButton, 
-            manageServiceButton, 
-            viewTransactionButton, 
-            sendNotificationsButton,
-            logoutButton
-        );
-        
-        Scene scene = new Scene(root, 400, 350); 
+        Label welcomeLabel = new Label("Welcome, " + currentUser.getUserRole() + " " + currentUser.getUserName() + "!");
+        welcomeLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+
+        root.getChildren().add(welcomeLabel);
+
+        // Tambahkan tombol berdasarkan role
+        String role = currentUser.getUserRole().toLowerCase();
+
+        if (role.equals("admin")) {
+            Button manageEmployeeButton = new Button("Manage Employees");
+            Button manageServiceButton = new Button("Manage Services");
+            manageEmployeeButton.setPrefWidth(200);
+            manageServiceButton.setPrefWidth(200);
+            manageEmployeeButton.setOnAction(e -> { if (onManageEmployees != null) onManageEmployees.run(); });
+            manageServiceButton.setOnAction(e -> { if (onManageServices != null) onManageServices.run(); });
+            root.getChildren().addAll(manageEmployeeButton, manageServiceButton);
+        }
+
+        if (role.equals("receptionist") || role.equals("laundry staff") || role.equals("admin")) {
+            Button viewTransactionButton = new Button("View Transactions");
+            viewTransactionButton.setPrefWidth(200);
+            viewTransactionButton.setOnAction(e -> { if (onViewTransactions != null) onViewTransactions.run(); });
+            root.getChildren().add(viewTransactionButton);
+        }
+
+        // Semua role punya tombol notifications
+        Button sendNotificationsButton = new Button("Notifications");
+        sendNotificationsButton.setPrefWidth(200);
+        sendNotificationsButton.setOnAction(e -> { if (onSendNotifications != null) onSendNotifications.run(); });
+        root.getChildren().add(sendNotificationsButton);
+
+        // Semua role punya tombol logout/back
+        Button logoutButton = new Button("Logout");
+        logoutButton.setPrefWidth(200);
+        logoutButton.setOnAction(e -> { if (onLogout != null) onLogout.run(); });
+        root.getChildren().add(logoutButton);
+
+        Scene scene = new Scene(root, 400, 350);
         primaryStage.setScene(scene);
     }
-    
+
     public void show() {
         primaryStage.show();
     }
-    
+
     public void setOnManageEmployees(Runnable handler) {
         this.onManageEmployees = handler;
     }
@@ -87,7 +91,7 @@ public class AdminDashboardView {
         this.onViewTransactions = handler;
     }
 
-    public void setOnSendNotifications(Runnable handler) { 
+    public void setOnSendNotifications(Runnable handler) {
         this.onSendNotifications = handler;
     }
 

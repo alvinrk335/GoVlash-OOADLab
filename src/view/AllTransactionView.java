@@ -2,6 +2,7 @@ package view;
 
 import controller.NotificationController;
 import controller.TransactionController;
+import controller.UserController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.Transaction;
+import model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +21,8 @@ public class AllTransactionView{
 
     private TableView<Transaction> table;
     private Stage  stage;
-    private ComboBox<String> filterCombo; // admin filter
+    private ComboBox<String> filterCombo;
+    UserController userController = new UserController();
     private Button assignButton, markFinishedButton, backButton;
     private TransactionController controller = new TransactionController();
     private NotificationController notificationController = new NotificationController();
@@ -199,17 +202,27 @@ public class AllTransactionView{
             return;
         }
 
-        TextInputDialog staffDialog = new TextInputDialog();
-        staffDialog.setHeaderText("Enter Staff ID to assign:");
-        staffDialog.showAndWait().ifPresent(input -> {
-            try {
-                int staffId = Integer.parseInt(input);
-                if (controller.assignTransactionToStaff(t.getTransactionID(), staffId)) {
-                    showAlert("Transaction assigned.");
-                    refreshTable();
-                } else showAlert("Failed to assign.");
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Staff ID.");
+        ObservableList<User> staffList = userController.getUsersByRole("Laundry Staff");
+
+        if (staffList.isEmpty()) {
+            showAlert("No staff available to assign.");
+            return;
+        }
+
+        ChoiceDialog<User> dialog = new ChoiceDialog<>(staffList.get(0), staffList);
+        dialog.setTitle("Assign Transaction");
+        dialog.setHeaderText("Select a staff to assign:");
+        dialog.setContentText("Staff:");
+
+        // panggil showAndWait hanya sekali
+        dialog.showAndWait().ifPresent(selectedStaff -> {
+            int staffId = selectedStaff.getUserID();
+            if (controller.assignTransactionToStaff(t.getTransactionID(), staffId)) {
+                showAlert("Transaction assigned to " + selectedStaff.getUserName());
+                notificationController.sendNotification(staffId, "A new transaction has been assigned to you.");
+                refreshTable();
+            } else {
+                showAlert("Failed to assign transaction.");
             }
         });
     }

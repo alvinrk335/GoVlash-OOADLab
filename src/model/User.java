@@ -110,4 +110,9 @@ public class User {
                userGender != null && (userGender.equals("Male") || userGender.equals("Female")) &&
                userDOB != null;
     }
+    
+    @Override
+    public String toString() {
+        return getUserName() + " (ID: " + getUserID() + ")";
+    }
 }

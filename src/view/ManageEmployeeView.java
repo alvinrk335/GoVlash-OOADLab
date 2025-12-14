@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.Employee;
+import model.User;
 
 public class ManageEmployeeView {
 
@@ -20,12 +21,12 @@ public class ManageEmployeeView {
     private UserController controller = new UserController();
     private Runnable backAction;
     private Stage stage;
-    
-    public ManageEmployeeView(Stage stage) {
-    	this.stage = stage;
-    	init();
-    	
-    	
+    private User currentUser;
+
+    public ManageEmployeeView(Stage stage, User currentUser) {
+        this.stage = stage;
+        this.currentUser = currentUser;
+        init();
     }
 
     public void setBackAction(Runnable backAction) {
@@ -34,6 +35,8 @@ public class ManageEmployeeView {
 
     public void init() {
         stage.setTitle("Manage Employees");
+
+        boolean isAdmin = currentUser.getUserRole().equalsIgnoreCase("admin");
 
         // LEFT FORM
         VBox formBox = new VBox(10);
@@ -66,21 +69,33 @@ public class ManageEmployeeView {
         tfRole = new TextField();
         tfRole.setPromptText("Role (Admin/Receptionist/Laundry Staff)");
 
-        btnAdd = new Button("Add");
-        btnUpdate = new Button("Update");
-        btnClear = new Button("Clear");
-        btnRefresh = new Button("Refresh");
         btnBack = new Button("Back");
-
-        btnAdd.setPrefWidth(200);
-        btnUpdate.setPrefWidth(200);
-        btnClear.setPrefWidth(200);
-        btnRefresh.setPrefWidth(200);
         btnBack.setPrefWidth(200);
+        btnBack.setOnAction(e -> {
+            if (backAction != null) backAction.run();
+        });
 
-        formBox.getChildren().addAll(lblTitle, tfName, tfEmail, tfPassword, tfConfirmPassword,
-                tfGender, dpDOB, tfRole,
-                btnAdd, btnUpdate, btnClear, btnRefresh, btnBack);
+        formBox.getChildren().add(lblTitle);
+
+        if (isAdmin) {
+            btnAdd = new Button("Add");
+            btnUpdate = new Button("Update");
+            btnClear = new Button("Clear");
+
+
+            btnAdd.setPrefWidth(200);
+            btnUpdate.setPrefWidth(200);
+            btnClear.setPrefWidth(200);
+
+
+            formBox.getChildren().addAll(tfName, tfEmail, tfPassword, tfConfirmPassword,
+                    tfGender, dpDOB, tfRole,
+                    btnAdd, btnUpdate, btnClear);
+        }
+        btnRefresh = new Button("Refresh");
+        btnRefresh.setPrefWidth(200);
+
+        formBox.getChildren().addAll(btnRefresh, btnBack);
 
         // RIGHT TABLE
         table = new TableView<>();
@@ -107,29 +122,24 @@ public class ManageEmployeeView {
         table.getColumns().addAll(colID, colName, colEmail, colRole, colGender, colDOB);
         table.setPrefWidth(600);
 
-        table.setOnMouseClicked(e -> fillFormFromTable());
+        if (isAdmin) {
+            table.setOnMouseClicked(e -> fillFormFromTable());
+            // BUTTON ACTIONS
+            btnAdd.setOnAction(e -> addEmployee());
+            btnUpdate.setOnAction(e -> updateEmployee());
+            btnClear.setOnAction(e -> clearForm());
 
-        refreshTable();
-
-        // BUTTON ACTIONS
-        btnAdd.setOnAction(e -> addEmployee());
-        btnUpdate.setOnAction(e -> updateEmployee());
-        btnClear.setOnAction(e -> clearForm());
+        }
         btnRefresh.setOnAction(e -> refreshTable());
-        btnBack.setOnAction(e -> {
-            Stage stg = (Stage) btnBack.getScene().getWindow();
-            stg.close();
-            if (backAction != null) backAction.run();
-        });
+        refreshTable();
 
         HBox root = new HBox(formBox, table);
         HBox.setHgrow(table, Priority.ALWAYS);
 
         Scene scene = new Scene(root, 1000, 500);
         stage.setScene(scene);
-
     }
-    
+
     public void show() {
         stage.show();
     }
@@ -149,14 +159,9 @@ public class ManageEmployeeView {
 
     private void addEmployee() {
         String msg = controller.validateAddEmployee(
-                tfName.getText(),
-                tfEmail.getText(),
-                tfPassword.getText(),
-                tfConfirmPassword.getText(),
-                tfGender.getText(),
-                dpDOB.getValue(),
-                tfRole.getText()
-        );
+                tfName.getText(), tfEmail.getText(),
+                tfPassword.getText(), tfConfirmPassword.getText(),
+                tfGender.getText(), dpDOB.getValue(), tfRole.getText());
 
         if (msg.equalsIgnoreCase("employee registered")) {
             controller.addEmployee(tfName.getText(), tfEmail.getText(), tfPassword.getText(),
@@ -164,9 +169,7 @@ public class ManageEmployeeView {
             showInfoAlert("Employee added successfully!");
             refreshTable();
             clearForm();
-        } else {
-            showErrorAlert(msg);
-        }
+        } else showErrorAlert(msg);
     }
 
     private void updateEmployee() {
@@ -175,18 +178,12 @@ public class ManageEmployeeView {
             showErrorAlert("Select an employee first!");
             return;
         }
+
         String password = tfPassword.getText().isBlank() ? emp.getUserPassword() : tfPassword.getText();
         String confirmPassword = tfConfirmPassword.getText().isBlank() ? password : tfConfirmPassword.getText();
 
-        String msg = controller.validateAddEmployee(
-                tfName.getText(),
-                tfEmail.getText(),
-                password,
-                confirmPassword,
-                tfGender.getText(),
-                dpDOB.getValue(),
-                tfRole.getText()
-        );
+        String msg = controller.validateAddEmployee(tfName.getText(), tfEmail.getText(),
+                password, confirmPassword, tfGender.getText(), dpDOB.getValue(), tfRole.getText());
 
         if (msg.equalsIgnoreCase("employee registered")) {
             controller.addEmployee(tfName.getText(), tfEmail.getText(), password,
@@ -194,9 +191,7 @@ public class ManageEmployeeView {
             showInfoAlert("Employee updated successfully!");
             refreshTable();
             clearForm();
-        } else {
-            showErrorAlert(msg);
-        }
+        } else showErrorAlert(msg);
     }
 
     private void refreshTable() {
