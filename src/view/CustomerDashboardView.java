@@ -52,8 +52,8 @@ public class CustomerDashboardView {
     }
 
 
-    public void setWelcomeMessage(String userName) {
-        welcomeLabel.setText("Welcome, " + userName + "!");
+    public void setWelcomeMessage(String msg) {
+        welcomeLabel.setText(msg );
     }
 
     public void setOnViewServices(Runnable action) {

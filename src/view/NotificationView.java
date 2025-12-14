@@ -34,6 +34,8 @@ public class NotificationView {
     public void init() {
         stage.setTitle("Notifications");
 
+        boolean isAdmin = user.getUserRole().equalsIgnoreCase("admin");
+
         // LEFT ACTIONS
         VBox actionBox = new VBox(10);
         actionBox.setPadding(new Insets(20));
@@ -44,17 +46,36 @@ public class NotificationView {
         Label lblTitle = new Label("Actions");
         lblTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        actionBox.getChildren().add(lblTitle);
+
+        // tombol hanya muncul kalau admin
+        if (isAdmin) {
+            btnDelete = new Button("Delete");
+            btnRefresh = new Button("Refresh");
+
+
+            btnDelete.setPrefWidth(200);
+            btnRefresh.setPrefWidth(200);
+
+            actionBox.getChildren().addAll(btnViewDetail, btnDelete, btnRefresh);
+
+            // BUTTON ACTIONS
+
+            btnDelete.setOnAction(e -> deleteNotification());
+            btnRefresh.setOnAction(e -> refreshTable());
+        }
+        
         btnViewDetail = new Button("View Detail");
-        btnDelete = new Button("Delete");
-        btnRefresh = new Button("Refresh");
-        btnBack = new Button("Back");
-
         btnViewDetail.setPrefWidth(200);
-        btnDelete.setPrefWidth(200);
-        btnRefresh.setPrefWidth(200);
-        btnBack.setPrefWidth(200);
+        btnViewDetail.setOnAction(e -> viewDetail());
 
-        actionBox.getChildren().addAll(lblTitle, btnViewDetail, btnDelete, btnRefresh, btnBack);
+        // tombol back selalu ada
+        btnBack = new Button("Back");
+        btnBack.setPrefWidth(200);
+        btnBack.setOnAction(e -> {
+            if (backAction != null) backAction.run();
+        });
+        actionBox.getChildren().addAll(btnViewDetail, btnBack);
 
         // RIGHT TABLE
         table = new TableView<>();
@@ -75,14 +96,6 @@ public class NotificationView {
         table.setPrefWidth(700);
 
         refreshTable();
-
-        // BUTTON ACTIONS
-        btnViewDetail.setOnAction(e -> viewDetail());
-        btnDelete.setOnAction(e -> deleteNotification());
-        btnRefresh.setOnAction(e -> refreshTable());
-        btnBack.setOnAction(e -> {
-            if (backAction != null) backAction.run();
-        });
 
         HBox root = new HBox(actionBox, table);
         HBox.setHgrow(table, Priority.ALWAYS);
