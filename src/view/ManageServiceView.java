@@ -1,220 +1,235 @@
 package view;
 
 import controller.ServiceController;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Service;
 
+/**
+ * Tampilan untuk manajemen layanan laundry (Admin only)
+ * Menyediakan form untuk menambah, mengubah, menghapus, dan melihat layanan.
+ */
 public class ManageServiceView {
 
-	private TableView<Service> table;
-	private TextField tfName, tfDescription, tfPrice, tfDuration;
-	private Button btnAdd, btnUpdate, btnDelete, btnClear, btnBack;
-	private ServiceController controller = new ServiceController();
+    private TableView<Service> table;
+    private TextField tfName, tfDescription, tfPrice, tfDuration;
+    private Button btnAdd, btnUpdate, btnDelete, btnClear, btnBack;
+    private ServiceController controller = new ServiceController();
+    private Runnable backAction;
 
-	private Runnable backAction;
+    /**
+     * Menetapkan aksi tombol back
+     */
+    public void setBackButtonAction(Runnable backAction) {
+        this.backAction = backAction;
+    }
 
-	public void setBackButtonAction(Runnable backAction) {
-		this.backAction = backAction;
-	}
+    /**
+     * Menampilkan view
+     */
+    public void show() {
+        Stage stage = new Stage();
+        start(stage);
+    }
 
-	public void show() {
-		Stage stage = new Stage();
-		start(stage);
-	}
+    /**
+     * Inisialisasi komponen tampilan
+     */
+    public void start(Stage stage) {
+        stage.setTitle("Service Management");
 
-	public void start(Stage stage) {
-		stage.setTitle("Service Management");
+        // LEFT FORM
+        Label lblTitle = new Label("Service Form");
+        lblTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-		//left side
-		Label lblTitle = new Label("Service Form");
-		lblTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        tfName = new TextField();
+        tfName.setPromptText("Service Name");
 
-		tfName = new TextField();
-		tfName.setPromptText("Service Name");
+        tfDescription = new TextField();
+        tfDescription.setPromptText("Service Description");
 
-		tfDescription = new TextField();
-		tfDescription.setPromptText("Service Description");
+        tfPrice = new TextField();
+        tfPrice.setPromptText("Price");
 
-		tfPrice = new TextField();
-		tfPrice.setPromptText("Price");
+        tfDuration = new TextField();
+        tfDuration.setPromptText("Duration (1-30 days)");
 
-		tfDuration = new TextField();
-		tfDuration.setPromptText("Duration (1-30)");
+        btnAdd = new Button("Add");
+        btnUpdate = new Button("Update");
+        btnDelete = new Button("Delete");
+        btnClear = new Button("Clear");
+        btnBack = new Button("Back");
 
-		btnAdd = new Button("Add");
-		btnUpdate = new Button("Update");
-		btnDelete = new Button("Delete");
-		btnClear = new Button("Clear");
-		btnBack = new Button("Back");
+        // set button widths
+        btnAdd.setPrefWidth(120);
+        btnUpdate.setPrefWidth(120);
+        btnDelete.setPrefWidth(120);
+        btnClear.setPrefWidth(120);
+        btnBack.setPrefWidth(120);
 
-		btnAdd.setPrefWidth(120);
-		btnUpdate.setPrefWidth(120);
-		btnDelete.setPrefWidth(120);
-		btnClear.setPrefWidth(120);
-		btnBack.setPrefWidth(120);
+        VBox formBox = new VBox(10, lblTitle, tfName, tfDescription, tfPrice, tfDuration,
+                btnAdd, btnUpdate, btnDelete, btnClear, btnBack);
+        formBox.setPadding(new Insets(20));
+        formBox.setPrefWidth(300);
+        formBox.setAlignment(Pos.TOP_CENTER);
+        formBox.setStyle("-fx-background-color: #f1f1f1;");
 
-		VBox formBox = new VBox(10, lblTitle, tfName, tfDescription, tfPrice, tfDuration,
-				btnAdd, btnUpdate, btnDelete, btnClear, btnBack 
-		);
+        // RIGHT TABLE
+        table = new TableView<>();
+        refreshTable();
 
-		formBox.setPadding(new Insets(20));
-		formBox.setPrefWidth(300);
-		formBox.setAlignment(Pos.TOP_CENTER);
-		formBox.setStyle("-fx-background-color: #f1f1f1;");
+        TableColumn<Service, Integer> colID = new TableColumn<>("ID");
+        colID.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getServiceID()).asObject());
 
-		// right side
-		table = new TableView<>();
-		table.setItems((ObservableList<Service>) controller.getAllServices());
+        TableColumn<Service, String> colName = new TableColumn<>("Name");
+        colName.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getServiceName()));
 
-		TableColumn<Service, Integer> colID = new TableColumn<>("ID");
-		colID.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getServiceID()).asObject());
+        TableColumn<Service, String> colDesc = new TableColumn<>("Description");
+        colDesc.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getServiceDescription()));
 
-		TableColumn<Service, String> colName = new TableColumn<>("Name");
-		colName.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getServiceName()));
+        TableColumn<Service, Double> colPrice = new TableColumn<>("Price");
+        colPrice.setCellValueFactory(data -> new javafx.beans.property.SimpleDoubleProperty(data.getValue().getServicePrice()).asObject());
 
-		TableColumn<Service, String> colDesc = new TableColumn<>("Description");
-		colDesc.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getServiceDescription()));
+        TableColumn<Service, Integer> colDur = new TableColumn<>("Duration");
+        colDur.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getServiceDuration()).asObject());
 
-		TableColumn<Service, Double> colPrice = new TableColumn<>("Price");
-		colPrice.setCellValueFactory(data -> new javafx.beans.property.SimpleDoubleProperty(data.getValue().getServicePrice()).asObject());
+        table.getColumns().addAll(colID, colName, colDesc, colPrice, colDur);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-		TableColumn<Service, Integer> colDur = new TableColumn<>("Duration");
-		colDur.setCellValueFactory(data -> new javafx.beans.property.SimpleIntegerProperty(data.getValue().getServiceDuration()).asObject());
+        table.setOnMouseClicked(e -> fillFormFromTable());
 
-		table.getColumns().addAll(colID, colName, colDesc, colPrice, colDur);
-		table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        // TOMBOL EVENT
+        btnAdd.setOnAction(e -> addService());
+        btnUpdate.setOnAction(e -> updateService());
+        btnDelete.setOnAction(e -> deleteService());
+        btnClear.setOnAction(e -> clearForm());
+        btnBack.setOnAction(e -> {
+            if (backAction != null) {
+                Stage stg = (Stage) btnBack.getScene().getWindow();
+                stg.close();     
+                backAction.run(); 
+            }
+        });
 
-		table.setOnMouseClicked(e -> fillFormFromTable());
+        HBox root = new HBox(formBox, table);
+        HBox.setHgrow(table, Priority.ALWAYS);
 
+        Scene scene = new Scene(root, 900, 500);
+        stage.setScene(scene);
+        stage.show();
+    }
 
-		btnAdd.setOnAction(e -> addService());
-		btnUpdate.setOnAction(e -> updateService());
-		btnDelete.setOnAction(e -> deleteService());
-		btnClear.setOnAction(e -> clearForm());
+    /** Mengisi form dari tabel */
+    private void fillFormFromTable() {
+        Service s = table.getSelectionModel().getSelectedItem();
+        if (s == null) return;
+        tfName.setText(s.getServiceName());
+        tfDescription.setText(s.getServiceDescription());
+        tfPrice.setText(String.valueOf(s.getServicePrice()));
+        tfDuration.setText(String.valueOf(s.getServiceDuration()));
+    }
 
+    /** Menambah layanan baru */
+    private void addService() {
+        try {
+            String msg = controller.validateAddService(
+                    tfName.getText(),
+                    tfDescription.getText(),
+                    Double.parseDouble(tfPrice.getText()),
+                    Integer.parseInt(tfDuration.getText())
+            );
 
-		btnBack.setOnAction(e -> {
-			if (backAction != null) {
-				Stage stg = (Stage) btnBack.getScene().getWindow();
-				stg.close();     
-				backAction.run(); 
-			}
-		});
+            if (msg.equalsIgnoreCase("service valid")) {
+                controller.addService(
+                        tfName.getText(),
+                        tfDescription.getText(),
+                        Double.parseDouble(tfPrice.getText()),
+                        Integer.parseInt(tfDuration.getText())
+                );
+            }
 
-		HBox root = new HBox(formBox, table);
-		HBox.setHgrow(table, Priority.ALWAYS);
+            alert(msg);
+            refreshTable();
+            clearForm();
 
-		Scene scene = new Scene(root, 900, 500);
-		stage.setScene(scene);
-		stage.show();
-	}
+        } catch (Exception e) {
+            alert("Please enter valid numbers for price/duration!");
+        }
+    }
 
+    /** Mengubah layanan yang dipilih */
+    private void updateService() {
+        Service s = table.getSelectionModel().getSelectedItem();
+        if (s == null) {
+            alert("Select a service first!");
+            return;
+        }
 
+        try {
+            String msg = controller.validateEditService(
+                    s.getServiceID(),
+                    tfName.getText(),
+                    tfDescription.getText(),
+                    Double.parseDouble(tfPrice.getText()),
+                    Integer.parseInt(tfDuration.getText())
+            );
 
-	private void fillFormFromTable() {
-		Service s = table.getSelectionModel().getSelectedItem();
-		if (s == null) return;
+            if (msg.equalsIgnoreCase("service valid")) {
+                controller.editService(
+                        s.getServiceID(),
+                        tfName.getText(),
+                        tfDescription.getText(),
+                        Double.parseDouble(tfPrice.getText()),
+                        Integer.parseInt(tfDuration.getText())
+                );
+            }
 
-		tfName.setText(s.getServiceName());
-		tfDescription.setText(s.getServiceDescription());
-		tfPrice.setText(String.valueOf(s.getServicePrice()));
-		tfDuration.setText(String.valueOf(s.getServiceDuration()));
-	}
+            alert(msg);
+            refreshTable();
 
-	private void addService() {
-		try {
-			String msg = controller.validateAddService(
-					tfName.getText(),
-					tfDescription.getText(),
-					Double.parseDouble(tfPrice.getText()),
-					Integer.parseInt(tfDuration.getText())
-			);
+        } catch (Exception e) {
+            alert("Please enter valid numbers for price/duration!");
+        }
+    }
 
-			if (msg.equalsIgnoreCase("service valid")) {
-				controller.addService(
-						tfName.getText(),
-						tfDescription.getText(),
-						Double.parseDouble(tfPrice.getText()),
-						Integer.parseInt(tfDuration.getText())
-				);
-			}
+    /** Menghapus layanan yang dipilih */
+    private void deleteService() {
+        Service s = table.getSelectionModel().getSelectedItem();
+        if (s == null) {
+            alert("Select a service to delete!");
+            return;
+        }
 
-			alert(msg);
-			refresh();
-			clearForm();
+        controller.deleteService(s.getServiceID());
+        alert("Service deleted!");
+        refreshTable();
+        clearForm();
+    }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    /** Menyegarkan tabel layanan */
+    private void refreshTable() {
+        ObservableList<Service> services = FXCollections.observableArrayList(controller.getAllServices());
+        table.setItems(services);
+    }
 
-	private void updateService() {
-		Service s = table.getSelectionModel().getSelectedItem();
-		if (s == null) {
-			alert("Select a service first!");
-			return;
-		}
+    /** Membersihkan form input */
+    private void clearForm() {
+        tfName.clear();
+        tfDescription.clear();
+        tfPrice.clear();
+        tfDuration.clear();
+        table.getSelectionModel().clearSelection();
+    }
 
-		try {
-			String msg = controller.validateEditService(
-					s.getServiceID(),
-					tfName.getText(),
-					tfDescription.getText(),
-					Double.parseDouble(tfPrice.getText()),
-					Integer.parseInt(tfDuration.getText())
-			);
-
-			if (msg.equalsIgnoreCase("service valid")) {
-				controller.editService(
-						s.getServiceID(),
-						tfName.getText(),
-						tfDescription.getText(),
-						Double.parseDouble(tfPrice.getText()),
-						Integer.parseInt(tfDuration.getText())
-				);
-			}
-
-			alert(msg);
-			refresh();
-
-		} catch (Exception e) {
-			alert("Please fill price/duration with numbers!");
-		}
-	}
-
-	private void deleteService() {
-		Service s = table.getSelectionModel().getSelectedItem();
-		if (s == null) {
-			alert("Select a service to delete!");
-			return;
-		}
-
-		controller.deleteService(s.getServiceID());
-		alert("Service deleted!");
-		refresh();
-		clearForm();
-	}
-
-	private void refresh() {
-		table.setItems((ObservableList<Service>) controller.getAllServices());
-	}
-
-	private void clearForm() {
-		tfName.clear();
-		tfDescription.clear();
-		tfPrice.clear();
-		tfDuration.clear();
-		table.getSelectionModel().clearSelection();
-	}
-
-	private void alert(String msg) {
-		Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
-		a.show();
-	}
+    /** Menampilkan alert sederhana */
+    private void alert(String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
+        a.show();
+    }
 }

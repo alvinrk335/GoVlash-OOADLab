@@ -10,6 +10,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+/**
+ * Tampilan dashboard untuk customer.
+ * Menyediakan tombol untuk melihat layanan, melihat pesanan sendiri,
+ * melihat notifikasi, dan logout.
+ */
 public class CustomerDashboardView {
     private Stage primaryStage;
     
@@ -19,11 +24,17 @@ public class CustomerDashboardView {
     private Button viewNotificationsButton;
     private Button logoutButton;
 
+    /**
+     * Konstruktor menerima stage utama
+     */
     public CustomerDashboardView(Stage stage) {
         this.primaryStage = stage;
         initComponents();
     }
     
+    /**
+     * Inisialisasi komponen UI dan layout
+     */
     private void initComponents() {
         primaryStage.setTitle("GoVlash Laundry - Customer Dashboard");
         
@@ -39,7 +50,7 @@ public class CustomerDashboardView {
         viewNotificationsButton = new Button("View Notifications");
         logoutButton = new Button("Logout");
         
-        // Button styling
+        // Set lebar tombol agar konsisten
         viewServicesButton.setPrefWidth(200);
         viewMyOrdersButton.setPrefWidth(200);
         viewNotificationsButton.setPrefWidth(200); 
@@ -51,27 +62,44 @@ public class CustomerDashboardView {
         primaryStage.setScene(scene);
     }
 
-
+    /**
+     * Set pesan selamat datang pada dashboard
+     */
     public void setWelcomeMessage(String msg) {
         welcomeLabel.setText(msg );
     }
 
+    /**
+     * Set aksi saat tombol "View Services" diklik
+     */
     public void setOnViewServices(Runnable action) {
         viewServicesButton.setOnAction(e -> action.run());
     }
 
+    /**
+     * Set aksi saat tombol "View My Orders" diklik
+     */
     public void setOnViewMyOrders(Runnable action) {
         viewMyOrdersButton.setOnAction(e -> action.run());
     }
 
-    public void setOnViewNotifications(Runnable action) { // new
+    /**
+     * Set aksi saat tombol "View Notifications" diklik
+     */
+    public void setOnViewNotifications(Runnable action) {
         viewNotificationsButton.setOnAction(e -> action.run());
     }
 
+    /**
+     * Set aksi saat tombol "Logout" diklik
+     */
     public void setOnLogout(Runnable action) {
         logoutButton.setOnAction(e -> action.run());
     }
     
+    /**
+     * Menampilkan stage dashboard
+     */
     public void show() {
         primaryStage.show();
     }

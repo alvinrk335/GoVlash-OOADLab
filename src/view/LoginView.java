@@ -9,6 +9,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+/**
+ * Tampilan login untuk aplikasi GoVlash Laundry.
+ * Menyediakan field untuk username dan password, serta tombol login dan register.
+ * Menampilkan pesan error atau sukses sesuai interaksi pengguna.
+ */
 public class LoginView {
 
     private Stage primaryStage;
@@ -18,11 +23,17 @@ public class LoginView {
     private Button loginButton;
     private Button registerButton;
 
+    /**
+     * Konstruktor menerima stage utama untuk ditampilkan
+     */
     public LoginView(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initializeComponents();
     }
 
+    /**
+     * Inisialisasi komponen UI, layout, dan styling
+     */
     private void initializeComponents() {
         primaryStage.setTitle("GoVlash Laundry - Login");
 
@@ -78,34 +89,60 @@ public class LoginView {
         primaryStage.setScene(scene);
     }
 
+    /**
+     * Menampilkan stage
+     */
     public void show() {
         primaryStage.show();
     }
 
-    // Getters and setters
+    // ---------------------------
+    // Getters dan setters untuk interaksi controller
+    // ---------------------------
+
+    /**
+     * Mengambil username dari field input
+     */
     public String getUsername() {
         return usernameField.getText().trim();
     }
 
+    /**
+     * Mengambil password dari field input
+     */
     public String getPassword() {
         return passwordField.getText().trim();
     }
 
+    /**
+     * Menampilkan pesan di bawah form
+     * @param message Pesan yang ingin ditampilkan
+     * @param isError true jika pesan error, false jika sukses
+     */
     public void setMessage(String message, boolean isError) {
         messageLabel.setText(message);
         messageLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
     }
 
+    /**
+     * Menghapus isi field dan pesan
+     */
     public void clearFields() {
         usernameField.clear();
         passwordField.clear();
         messageLabel.setText("");
     }
 
+    /**
+     * Set aksi saat tombol login diklik
+     */
     public void setLoginButtonAction(Runnable action) {
         loginButton.setOnAction(e -> action.run());
     }
 
+    /**
+     * Set aksi saat tombol register diklik
+     */
     public void setRegisterButtonAction(Runnable action) {
         registerButton.setOnAction(e -> action.run());
     }

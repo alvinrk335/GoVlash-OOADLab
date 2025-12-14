@@ -8,15 +8,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO untuk operasi CRUD Transaction di database
+ */
 public class TransactionDAO {
     private final Connect connect = Connect.getInstance();
     private final String tableName = "headertransaction"; 
 
-    // Insert transaction
+    /**
+     * Menambahkan transaksi baru
+     * @param transaction objek Transaction
+     * @return true jika berhasil, false jika gagal
+     */
     public boolean insert(Transaction transaction) {
         if (transaction == null) return false;
         try {
-            String query = "INSERT INTO " + tableName + " (serviceID, customerID, transactionDate, transactionStatus, totalWeight, transactionNotes) VALUES (" +
+            String query = "INSERT INTO " + tableName +
+                    " (serviceID, customerID, transactionDate, transactionStatus, totalWeight, transactionNotes) VALUES (" +
                     transaction.getServiceID() + ", " + transaction.getCustomerID() + ", '" +
                     transaction.getTransactionDate() + "', '" +
                     transaction.getTransactionStatus() + "', " +
@@ -30,7 +38,10 @@ public class TransactionDAO {
         return false;
     }
 
-    // Select all transactions
+    /**
+     * Mengambil semua transaksi
+     * @return list transaksi
+     */
     public List<Transaction> getAll() {
         List<Transaction> transactions = new ArrayList<>();
         try {
@@ -45,7 +56,11 @@ public class TransactionDAO {
         return transactions;
     }
 
-    // Select transactions by customer
+    /**
+     * Mengambil transaksi berdasarkan ID customer
+     * @param customerId id customer
+     * @return list transaksi customer
+     */
     public List<Transaction> getByCustomer(int customerId) {
         List<Transaction> transactions = new ArrayList<>();
         try {
@@ -60,7 +75,11 @@ public class TransactionDAO {
         return transactions;
     }
 
-    // Select transactions by status
+    /**
+     * Mengambil transaksi berdasarkan status
+     * @param status status transaksi (Pending, Finished, Assigned, dll)
+     * @return list transaksi
+     */
     public List<Transaction> getByStatus(String status) {
         List<Transaction> transactions = new ArrayList<>();
         try {
@@ -75,7 +94,12 @@ public class TransactionDAO {
         return transactions;
     }
 
-    // Update transaction status
+    /**
+     * Update status transaksi
+     * @param transactionId id transaksi
+     * @param newStatus status baru
+     * @return true jika berhasil
+     */
     public boolean updateStatus(int transactionId, String newStatus) {
         try {
             String query = "UPDATE " + tableName + " SET transactionStatus = '" + newStatus + "' WHERE transactionID = " + transactionId;
@@ -87,10 +111,16 @@ public class TransactionDAO {
         return false;
     }
 
-    // Assign transaction to staff
+    /**
+     * Assign transaksi ke staff laundry
+     * @param transactionId id transaksi
+     * @param staffId id staff
+     * @return true jika berhasil
+     */
     public boolean assignToStaff(int transactionId, int staffId) {
         try {
-            String query = "UPDATE " + tableName + " SET laundryStaffID = " + staffId + ", transactionStatus = 'Assigned' WHERE transactionID = " + transactionId + " AND transactionStatus = 'Pending'";
+            String query = "UPDATE " + tableName + " SET laundryStaffID = " + staffId + ", transactionStatus = 'Assigned' " +
+                    "WHERE transactionID = " + transactionId + " AND transactionStatus = 'Pending'";
             connect.execUpdate(query);
             return true;
         } catch (Exception e) {
@@ -99,7 +129,12 @@ public class TransactionDAO {
         return false;
     }
 
-    // map rs ke Transaction
+    /**
+     * Map ResultSet ke object Transaction
+     * @param rs ResultSet
+     * @return objek Transaction
+     * @throws SQLException
+     */
     private Transaction mapResultSetToTransaction(ResultSet rs) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setTransactionID(rs.getInt("transactionID"));
@@ -115,11 +150,15 @@ public class TransactionDAO {
         transaction.setTransactionNotes(rs.getString("transactionNotes"));
         return transaction;
     }
-    // Validasi customer
+
+    /**
+     * Validasi apakah customer valid
+     * @param customerId id customer
+     * @return true jika ada dan role = Customer
+     */
     public boolean isValidCustomer(int customerId) {
         try {
-            String query = "SELECT COUNT(*) as cnt FROM msuser WHERE userID = " + customerId + 
-                           " AND userRole = 'Customer'";
+            String query = "SELECT COUNT(*) as cnt FROM msuser WHERE userID = " + customerId + " AND userRole = 'Customer'";
             ResultSet rs = connect.execQuery(query);
             if (rs.next()) {
                 return rs.getInt("cnt") > 0;
@@ -130,7 +169,11 @@ public class TransactionDAO {
         return false;
     }
 
-    // Validasi service
+    /**
+     * Validasi apakah service valid
+     * @param serviceId id service
+     * @return true jika service ada
+     */
     public boolean isValidService(int serviceId) {
         try {
             String query = "SELECT COUNT(*) as cnt FROM msservice WHERE serviceID = " + serviceId;
@@ -143,6 +186,4 @@ public class TransactionDAO {
         }
         return false;
     }
-
-
 }

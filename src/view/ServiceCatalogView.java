@@ -15,6 +15,14 @@ import controller.ServiceController;
 
 import java.util.List;
 
+/**
+ * ServiceCatalogView adalah tampilan katalog layanan laundry.
+ * Fitur:
+ * - Menampilkan daftar layanan yang tersedia
+ * - Menampilkan detail layanan ketika dipilih
+ * - Memungkinkan pelanggan memilih layanan
+ * - Menampilkan pesan informasi atau error
+ */
 public class ServiceCatalogView {
     
     private Stage primaryStage;
@@ -27,12 +35,19 @@ public class ServiceCatalogView {
     private Service selectedService;
     private Runnable onServiceSelected;
     
+    /**
+     * Konstruktor ServiceCatalogView
+     * @param primaryStage Stage utama
+     */
     public ServiceCatalogView(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.serviceController = new ServiceController();
         initializeComponents();
     }
     
+    /**
+     * Inisialisasi komponen UI dan layout
+     */
     private void initializeComponents() {
         primaryStage.setTitle("GoVlash Laundry - Service Catalog");
         
@@ -47,13 +62,11 @@ public class ServiceCatalogView {
         HBox mainContent = new HBox(20);
         mainContent.setAlignment(Pos.CENTER);
         
-        // Left side - Service list
+        // Left panel - List of services
         VBox leftPanel = new VBox(10);
         leftPanel.setPrefWidth(300);
-        
         Label servicesLabel = new Label("Select a Service:");
         servicesLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        
         serviceListView = new ListView<>();
         serviceListView.setPrefHeight(300);
         serviceListView.setCellFactory(listView -> new ServiceListCell());
@@ -67,22 +80,18 @@ public class ServiceCatalogView {
                 selectButton.setDisable(true);
             }
         });
-        
         leftPanel.getChildren().addAll(servicesLabel, serviceListView);
         
-        // Right side - Service details
+        // Right panel - Service details
         VBox rightPanel = new VBox(10);
         rightPanel.setPrefWidth(300);
-        
         Label detailsLabel = new Label("Service Details:");
         detailsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        
         serviceDetailsArea = new TextArea();
         serviceDetailsArea.setPrefHeight(300);
         serviceDetailsArea.setEditable(false);
         serviceDetailsArea.setWrapText(true);
         serviceDetailsArea.setPromptText("Select a service to view details");
-        
         rightPanel.getChildren().addAll(detailsLabel, serviceDetailsArea);
         
         mainContent.getChildren().addAll(leftPanel, rightPanel);
@@ -91,14 +100,11 @@ public class ServiceCatalogView {
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
-        
         selectButton = new Button("Select This Service");
         selectButton.setPrefWidth(150);
         selectButton.setDisable(true);
-        
         backButton = new Button("Back");
         backButton.setPrefWidth(100);
-        
         buttonBox.getChildren().addAll(selectButton, backButton);
         
         // Message label
@@ -115,6 +121,9 @@ public class ServiceCatalogView {
         primaryStage.setScene(scene);
     }
     
+    /**
+     * Setup event handler tombol
+     */
     private void setupEventHandlers() {
         selectButton.setOnAction(e -> {
             if (selectedService != null && onServiceSelected != null) {
@@ -123,6 +132,9 @@ public class ServiceCatalogView {
         });
     }
     
+    /**
+     * Load layanan dari controller ke ListView
+     */
     private void loadServices() {
         List<Service> services = serviceController.getAllServices();
         ObservableList<Service> serviceList = FXCollections.observableArrayList(services);
@@ -134,6 +146,10 @@ public class ServiceCatalogView {
         }
     }
     
+    /**
+     * Menampilkan detail dari layanan yang dipilih
+     * @param service Layanan yang dipilih
+     */
     private void showServiceDetails(Service service) {
         StringBuilder details = new StringBuilder();
         details.append("Service: ").append(service.getServiceName()).append("\n\n");
@@ -156,13 +172,14 @@ public class ServiceCatalogView {
         serviceDetailsArea.setText(details.toString());
     }
     
+    /**
+     * Menampilkan pesan di bawah tombol
+     * @param message Pesan
+     * @param isError True jika pesan error, false jika info
+     */
     private void showMessage(String message, boolean isError) {
         messageLabel.setText(message);
-        if (isError) {
-            messageLabel.setStyle("-fx-text-fill: red;");
-        } else {
-            messageLabel.setStyle("-fx-text-fill: green;");
-        }
+        messageLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
     }
     
     public void show() {
@@ -181,7 +198,9 @@ public class ServiceCatalogView {
         backButton.setOnAction(e -> action.run());
     }
     
-    // Custom ListCell for services
+    /**
+     * Custom ListCell untuk menampilkan nama, harga, dan durasi layanan
+     */
     private static class ServiceListCell extends ListCell<Service> {
         @Override
         protected void updateItem(Service service, boolean empty) {

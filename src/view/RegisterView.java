@@ -8,11 +8,19 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import model.Customer;
+
 
 import java.time.LocalDate;
 import controller.UserController;
 
+/**
+ * RegisterView adalah tampilan untuk registrasi customer baru.
+ * Fitur yang tersedia:
+ * - Input username, email, password, konfirmasi password, gender, dan tanggal lahir
+ * - Validasi input sebelum menambahkan customer
+ * - Menampilkan pesan error atau sukses
+ * - Tombol untuk kembali ke halaman login
+ */
 public class RegisterView {
     
     private Stage primaryStage;
@@ -27,12 +35,19 @@ public class RegisterView {
     private Button backButton;
     private UserController controller = new UserController();
     
+    /**
+     * Konstruktor RegisterView
+     * @param primaryStage Stage utama
+     */
     public RegisterView(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initializeComponents();
         setRegisterButtonAction();
     }
     
+    /**
+     * Inisialisasi komponen UI dan layout
+     */
     private void initializeComponents() {
         primaryStage.setTitle("GoVlash Laundry - Customer Registration");
         
@@ -87,7 +102,6 @@ public class RegisterView {
         // Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        
         registerButton = new Button("Register");
         backButton = new Button("Back to Login");
         buttonBox.getChildren().addAll(registerButton, backButton);
@@ -101,35 +115,26 @@ public class RegisterView {
         primaryStage.setScene(scene);
     }
     
+    /**
+     * Menampilkan stage
+     */
     public void show() {
         primaryStage.show();
     }
     
     // Getters for form data
-    public String getUsername() {
-        return usernameField.getText().trim();
-    }
+    public String getUsername() { return usernameField.getText().trim(); }
+    public String getEmail() { return emailField.getText().trim(); }
+    public String getPassword() { return passwordField.getText(); }
+    public String getConfirmPassword() { return confirmPasswordField.getText(); }
+    public String getGender() { return genderBox.getValue(); }
+    public LocalDate getDateOfBirth() { return dobPicker.getValue(); }
     
-    public String getEmail() {
-        return emailField.getText().trim();
-    }
-    
-    public String getPassword() {
-        return passwordField.getText();
-    }
-    
-    public String getConfirmPassword() {
-        return confirmPasswordField.getText();
-    }
-    
-    public String getGender() {
-        return genderBox.getValue();
-    }
-    
-    public LocalDate getDateOfBirth() {
-        return dobPicker.getValue();
-    }
-    
+    /**
+     * Menampilkan pesan pada label
+     * @param message Pesan
+     * @param isError True jika pesan error, false jika sukses
+     */
     public void setMessage(String message, boolean isError) {
         messageLabel.setText(message);
         if (isError) {
@@ -139,6 +144,9 @@ public class RegisterView {
         }
     }
     
+    /**
+     * Membersihkan semua input form
+     */
     public void clearFields() {
         usernameField.clear();
         emailField.clear();
@@ -149,31 +157,29 @@ public class RegisterView {
         messageLabel.setText("");
     }
     
+    /**
+     * Proses registrasi customer
+     */
     public void handleRegister() {
-    	
-    	
-		String uname = getUsername();
-		String email = getEmail();
-		String pwd = getPassword();
-		String confirm = getConfirmPassword();
-		String gender = getGender();
-		LocalDate dob = getDateOfBirth();
+        String uname = getUsername();
+        String email = getEmail();
+        String pwd = getPassword();
+        String confirm = getConfirmPassword();
+        String gender = getGender();
+        LocalDate dob = getDateOfBirth();
 
+        String registMsg = controller.validateAddCustomer(uname, email, pwd, confirm, gender, dob);
+        setMessage(registMsg, !registMsg.equals("customer registered, go back to login to continue"));
+        System.out.println(registMsg);
 
-		String registMsg = controller.validateAddCustomer(uname, email, pwd, confirm, gender, dob);
-		setMessage(registMsg, !registMsg.equals("customer registered, go back to login to continue"));
-		System.out.println(registMsg);
-
-		
-		if(registMsg.equals("customer registered, go back to login to continue")) {
-			controller.addCustomer(uname, email, pwd, gender, dob);
-		}
-		
+        if(registMsg.equals("customer registered, go back to login to continue")) {
+            controller.addCustomer(uname, email, pwd, gender, dob);
+        }
     }
     
     // Event handler setters
     public void setRegisterButtonAction() {
-    	registerButton.setOnAction(e -> handleRegister());
+        registerButton.setOnAction(e -> handleRegister());
     }
     
     public void setBackButtonAction(Runnable action) {

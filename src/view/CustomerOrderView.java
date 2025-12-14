@@ -20,6 +20,12 @@ import javafx.beans.property.SimpleStringProperty;
 import model.Service;
 import model.Transaction;
 
+/**
+ * Tampilan untuk menampilkan daftar pesanan customer.
+ * Menampilkan tabel berisi informasi transaksi, termasuk ID, berat,
+ * status, tanggal, layanan, estimasi harga, dan catatan.
+ * Jika belum ada pesanan, menampilkan pesan informasi.
+ */
 public class CustomerOrderView {
     private Stage primaryStage;
 
@@ -29,6 +35,9 @@ public class CustomerOrderView {
     private ObservableList<Transaction> transactionList;
     private List<Service> serviceList;
 
+    /**
+     * Konstruktor menerima stage, list transaksi, dan list layanan
+     */
     public CustomerOrderView(Stage stage, List<Transaction> transactions, List<Service> serviceList) {
         this.primaryStage = stage;
         this.transactionList = FXCollections.observableArrayList(transactions);
@@ -36,6 +45,9 @@ public class CustomerOrderView {
         initializeComponents();
     }
 
+    /**
+     * Inisialisasi komponen UI dan layout
+     */
     private void initializeComponents() {
         primaryStage.setTitle("GoVlash Laundry - My Orders");
 
@@ -96,11 +108,13 @@ public class CustomerOrderView {
 
         ordersTable.getColumns().addAll(idColumn, weightColumn, statusColumn, dateColumn, serviceColumn, priceColumn, notesColumn);
 
+        // Label untuk pesan ketika belum ada pesanan
         noOrdersLabel = new Label("You haven't placed any orders yet.\nClick 'View Services & Place Order' to get started!");
         noOrdersLabel.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
 
         backButton = new Button("Back to Dashboard");
 
+        // Tambahkan tabel atau pesan tergantung apakah ada transaksi
         if (transactionList != null && !transactionList.isEmpty()) {
             ordersTable.setItems(transactionList);
             root.getChildren().addAll(titleLabel, ordersTable, backButton);
@@ -112,10 +126,16 @@ public class CustomerOrderView {
         primaryStage.setScene(scene);
     }
 
+    /**
+     * Set aksi saat tombol "Back" diklik
+     */
     public void setBackAction(Runnable action) {
         backButton.setOnAction(e -> action.run());
     }
 
+    /**
+     * Menampilkan stage
+     */
     public void show() {
         primaryStage.show();
     }

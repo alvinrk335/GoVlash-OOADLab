@@ -11,9 +11,13 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.time.LocalDate;
 
+/**
+ * Tampilan untuk menambahkan employee baru
+ */
 public class AddEmployeeView {
     private Stage primaryStage;
 
+    // Form fields
     private TextField nameField;
     private TextField emailField;
     private PasswordField passwordField;
@@ -22,15 +26,22 @@ public class AddEmployeeView {
     private DatePicker dobPicker;
     private TextField roleField;
 
+    // UI components
     private Label messageLabel;
     private Button addButton;
     private Button backButton;
 
+    /**
+     * Konstruktor menerima stage utama
+     */
     public AddEmployeeView(Stage stage) {
         this.primaryStage = stage;
         initializeComponents();
     }
 
+    /**
+     * Inisialisasi semua komponen UI
+     */
     private void initializeComponents() {
         primaryStage.setTitle("GoVlash Laundry - Add New Employee");
 
@@ -38,14 +49,17 @@ public class AddEmployeeView {
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
 
+        // Judul halaman
         Label titleLabel = new Label("Add New Employee");
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
+        // Form grid
         GridPane form = new GridPane();
         form.setHgap(10);
         form.setVgap(10);
         form.setAlignment(Pos.CENTER);
 
+        // Label dan field input
         Label nameLabel = new Label("Name:");
         nameField = new TextField();
         nameField.setPromptText("Enter employee name");
@@ -75,6 +89,7 @@ public class AddEmployeeView {
         roleField = new TextField();
         roleField.setPromptText("Admin, Laundry Staff, Receptionist");
 
+        // Menambahkan field ke grid
         form.add(nameLabel, 0, 0);
         form.add(nameField, 1, 0);
         form.add(emailLabel, 0, 1);
@@ -90,9 +105,11 @@ public class AddEmployeeView {
         form.add(roleLabel, 0, 6);
         form.add(roleField, 1, 6);
 
+        // Label untuk menampilkan pesan
         messageLabel = new Label();
         messageLabel.setStyle("-fx-text-fill: blue;");
 
+        // Tombol aksi
         addButton = new Button("Add Employee");
         backButton = new Button("Back");
 
@@ -105,47 +122,40 @@ public class AddEmployeeView {
         primaryStage.setScene(scene);
     }
 
+    /**
+     * Set aksi untuk tombol Add Employee
+     */
     public void setAddAction(Runnable action) {
         addButton.setOnAction(e -> action.run());
     }
 
+    /**
+     * Set aksi untuk tombol Back
+     */
     public void setBackAction(Runnable action) {
         backButton.setOnAction(e -> action.run());
     }
 
-    public String getEmployeeName() {
-        return nameField.getText().trim();
-    }
+    // Getter untuk input user
+    public String getEmployeeName() { return nameField.getText().trim(); }
+    public String getEmployeeEmail() { return emailField.getText().trim(); }
+    public String getPassword() { return passwordField.getText().trim(); }
+    public String getConfirmPassword() { return confirmPasswordField.getText().trim(); }
+    public String getGender() { return genderBox.getValue(); }
+    public LocalDate getDOB() { return dobPicker.getValue(); }
+    public String getRole() { return roleField.getText().trim(); }
 
-    public String getEmployeeEmail() {
-        return emailField.getText().trim();
-    }
-
-    public String getPassword() {
-        return passwordField.getText().trim();
-    }
-
-    public String getConfirmPassword() {
-        return confirmPasswordField.getText().trim();
-    }
-
-    public String getGender() {
-        return genderBox.getValue();
-    }
-
-    public LocalDate getDOB() {
-        return dobPicker.getValue();
-    }
-
-    public String getRole() {
-        return roleField.getText().trim();
-    }
-
+    /**
+     * Tampilkan pesan ke user
+     */
     public void showMessage(String message, boolean isError) {
         messageLabel.setText(message);
         messageLabel.setStyle(isError ? "-fx-text-fill: red;" : "-fx-text-fill: green;");
     }
 
+    /**
+     * Clear semua input form
+     */
     public void clearForm() {
         nameField.clear();
         emailField.clear();
@@ -156,6 +166,9 @@ public class AddEmployeeView {
         roleField.clear();
     }
 
+    /**
+     * Tampilkan stage
+     */
     public void show() {
         primaryStage.show();
     }

@@ -12,25 +12,46 @@ import javafx.stage.Stage;
 import model.Notification;
 import model.User;
 
+/**
+ * NotificationView adalah tampilan untuk menampilkan notifikasi bagi user.
+ * Fitur yang tersedia:
+ * - Melihat detail notifikasi
+ * - Menandai notifikasi sebagai terbaca
+ * - Menghapus notifikasi (hanya admin)
+ * - Refresh tabel notifikasi (hanya admin)
+ * - Kembali ke tampilan sebelumnya
+ */
 public class NotificationView {
 
-    private TableView<Notification> table;
-    private Button btnViewDetail, btnDelete, btnRefresh, btnBack;
-    private NotificationController controller = new NotificationController();
-    private Runnable backAction; 
-    private Stage stage;
-    private User user;
+    private TableView<Notification> table; // Tabel untuk menampilkan notifikasi
+    private Button btnViewDetail, btnDelete, btnRefresh, btnBack; // Tombol aksi
+    private NotificationController controller = new NotificationController(); // Controller untuk logika notifikasi
+    private Runnable backAction;  // Callback untuk tombol back
+    private Stage stage; // Stage utama
+    private User user; // User yang sedang login
 
+    /**
+     * Konstruktor NotificationView
+     * @param stage Stage utama
+     * @param user User yang sedang login
+     */
     public NotificationView(Stage stage, User user) {
         this.stage = stage;
         this.user  = user;
         init();
     }
 
+    /**
+     * Set aksi callback untuk tombol back
+     * @param backAction Runnable yang dijalankan saat tombol back diklik
+     */
     public void setBackAction(Runnable backAction) {
         this.backAction = backAction;
     }
 
+    /**
+     * Inisialisasi komponen UI dan layout
+     */
     public void init() {
         stage.setTitle("Notifications");
 
@@ -48,11 +69,10 @@ public class NotificationView {
 
         actionBox.getChildren().add(lblTitle);
 
-        // tombol hanya muncul kalau admin
+        // Tombol hanya muncul kalau admin
         if (isAdmin) {
             btnDelete = new Button("Delete");
             btnRefresh = new Button("Refresh");
-
 
             btnDelete.setPrefWidth(200);
             btnRefresh.setPrefWidth(200);
@@ -60,16 +80,16 @@ public class NotificationView {
             actionBox.getChildren().addAll(btnDelete, btnRefresh);
 
             // BUTTON ACTIONS
-
             btnDelete.setOnAction(e -> deleteNotification());
             btnRefresh.setOnAction(e -> refreshTable());
         }
         
+        // Tombol view detail notifikasi
         btnViewDetail = new Button("View Detail");
         btnViewDetail.setPrefWidth(200);
         btnViewDetail.setOnAction(e -> viewDetail());
 
-        // tombol back selalu ada
+        // Tombol back selalu ada
         btnBack = new Button("Back");
         btnBack.setPrefWidth(200);
         btnBack.setOnAction(e -> {
@@ -104,15 +124,24 @@ public class NotificationView {
         stage.setScene(scene);
     }
 
+    /**
+     * Menampilkan stage
+     */
     public void show() {
         stage.show();
     }
 
+    /**
+     * Refresh tabel notifikasi dari database
+     */
     private void refreshTable() {
         ObservableList<Notification> list = FXCollections.observableArrayList(controller.getNotificationsByRecipientID(user.getUserID()));
         table.setItems(list);
     }
 
+    /**
+     * Melihat detail notifikasi dan menandai sebagai terbaca jika belum
+     */
     private void viewDetail() {
         Notification notif = table.getSelectionModel().getSelectedItem();
         if (notif == null) {
@@ -133,6 +162,9 @@ public class NotificationView {
         refreshTable();
     }
 
+    /**
+     * Menghapus notifikasi (admin only)
+     */
     private void deleteNotification() {
         Notification notif = table.getSelectionModel().getSelectedItem();
         if (notif == null) {
@@ -145,6 +177,10 @@ public class NotificationView {
         refreshTable();
     }
 
+    /**
+     * Menampilkan informasi alert
+     * @param msg Pesan yang ditampilkan
+     */
     private void showInfoAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
@@ -153,6 +189,10 @@ public class NotificationView {
         alert.showAndWait();
     }
 
+    /**
+     * Menampilkan error alert
+     * @param msg Pesan error
+     */
     private void showErrorAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

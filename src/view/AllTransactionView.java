@@ -17,6 +17,14 @@ import model.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Tampilan untuk melihat dan mengelola semua transaksi.
+ * Tombol dan aksi berbeda sesuai role user:
+ * - Admin: Bisa filter transaksi
+ * - Receptionist: Bisa assign transaksi ke Laundry Staff
+ * - Laundry Staff: Bisa menandai transaksi selesai
+ * - Customer: Bisa melihat transaksi miliknya
+ */
 public class AllTransactionView{
 
     private TableView<Transaction> table;
@@ -30,6 +38,9 @@ public class AllTransactionView{
     private String role;
     private int userId;
 
+    /**
+     * Konstruktor menerima stage, role user, dan userID
+     */
     public AllTransactionView(Stage stage, String role, int userId) {
         this.role = role.toLowerCase();
         this.userId = userId;
@@ -37,14 +48,20 @@ public class AllTransactionView{
         init();
     }
 
+    /**
+     * Setter aksi tombol Back
+     */
     public void setBackAction(Runnable action) {
         this.backAction = action;
     }
 
+    /**
+     * Inisialisasi UI
+     */
     public void init() {
         stage.setTitle("Transactions Management");
 
-        // LEFT FORM
+        // LEFT FORM: area tombol aksi
         VBox formBox = new VBox(10);
         formBox.setPadding(new Insets(20));
         formBox.setPrefWidth(300);
@@ -54,7 +71,7 @@ public class AllTransactionView{
         Label lblTitle = new Label("Transaction Actions");
         lblTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // admin filter
+        // Admin filter ComboBox
         if (role.equals("admin")) {
             filterCombo = new ComboBox<>(FXCollections.observableArrayList("All", "Pending", "Finished"));
             filterCombo.setValue("All");
@@ -64,7 +81,7 @@ public class AllTransactionView{
             formBox.getChildren().add(lblTitle);
         }
 
-        // receptionist assign
+        // Receptionist assign button
         if (role.equals("receptionist")) {
             assignButton = new Button("Assign to Staff");
             assignButton.setPrefWidth(200);
@@ -72,7 +89,7 @@ public class AllTransactionView{
             formBox.getChildren().add(assignButton);
         }
 
-        // laundry staff mark finished
+        // Laundry Staff mark finished button
         if (role.equals("laundry staff")) {
             markFinishedButton = new Button("Mark as Finished");
             markFinishedButton.setPrefWidth(200);
@@ -80,6 +97,7 @@ public class AllTransactionView{
             formBox.getChildren().add(markFinishedButton);
         }
 
+        // Tombol back untuk semua role
         backButton = new Button("Back");
         backButton.setPrefWidth(200);
         backButton.setOnAction(e -> {
@@ -89,7 +107,7 @@ public class AllTransactionView{
         });
         formBox.getChildren().add(backButton);
 
-        // RIGHT TABLE
+        // RIGHT TABLE: menampilkan daftar transaksi
         table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefWidth(600);
@@ -120,8 +138,10 @@ public class AllTransactionView{
 
         table.getColumns().addAll(colID, colCust, colService, colWeight, colStatus, colDate, colStaff);
 
+        // Enable tombol ketika row dipilih
         table.setOnMouseClicked(e -> tableRowSelected());
 
+        // Load data
         refreshTable();
 
         HBox root = new HBox(formBox, table);
@@ -131,12 +151,17 @@ public class AllTransactionView{
         stage.setScene(scene);
 
     }
-    
+
+    /**
+     * Menampilkan stage
+     */
     public void show() {
     	stage.show();
     }
-    
 
+    /**
+     * Refresh data tabel sesuai role dan filter
+     */
     private void refreshTable() {
         List<Transaction> transactions;
         switch (role) {
@@ -170,6 +195,9 @@ public class AllTransactionView{
         table.setItems(list);
     }
 
+    /**
+     * Memberi notifikasi ke customer setelah transaksi selesai
+     */
     private void finishTransaction() {
         Transaction selected = table.getSelectionModel().getSelectedItem();
         if (selected == null) {
@@ -182,7 +210,10 @@ public class AllTransactionView{
         showAlert("Transaction marked as finished and customer notified!");
         refreshTable();
     }
-    
+
+    /**
+     * Enable tombol ketika row dipilih
+     */
     private void tableRowSelected() {
         Transaction t = table.getSelectionModel().getSelectedItem();
         if (t == null) return;
@@ -195,6 +226,9 @@ public class AllTransactionView{
         }
     }
 
+    /**
+     * Assign transaksi ke staff melalui ChoiceDialog
+     */
     private void assignTransaction() {
         Transaction t = table.getSelectionModel().getSelectedItem();
         if (t == null) {
@@ -227,6 +261,9 @@ public class AllTransactionView{
         });
     }
 
+    /**
+     * Mark transaksi selesai
+     */
     private void markTransactionFinished() {
         Transaction t = table.getSelectionModel().getSelectedItem();
         if (t == null) {
@@ -241,6 +278,9 @@ public class AllTransactionView{
         } else showAlert("Failed to mark finished.");
     }
 
+    /**
+     * Menampilkan Alert informasi
+     */
     private void showAlert(String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
         a.show();
