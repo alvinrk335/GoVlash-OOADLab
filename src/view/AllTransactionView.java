@@ -101,8 +101,6 @@ public class AllTransactionView{
         backButton = new Button("Back");
         backButton.setPrefWidth(200);
         backButton.setOnAction(e -> {
-            Stage stg = (Stage) backButton.getScene().getWindow();
-            stg.close();
             if (backAction != null) backAction.run();
         });
         formBox.getChildren().add(backButton);
@@ -157,6 +155,13 @@ public class AllTransactionView{
      */
     public void show() {
     	stage.show();
+    }
+    
+    /**
+     * Set aksi tombol Back dari parent view
+     */
+    public void setBackButtonAction(Runnable action) {
+        this.backAction = action;
     }
 
     /**
